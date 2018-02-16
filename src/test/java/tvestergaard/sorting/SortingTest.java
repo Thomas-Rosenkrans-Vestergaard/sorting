@@ -12,6 +12,15 @@ public class SortingTest
 {
 
 	@Test
+	public void mergesortArrayNull() throws Exception
+	{
+		Integer[] actual = {6, 4, 2, null};
+		Integer[] expected = {null, 2, 4, 6};
+		Sorting.mergesort(actual);
+		assertArrayEquals(expected, actual);
+	}
+
+	@Test
 	public void mergesortArrayComparable() throws Exception
 	{
 		Integer[] actual   = new Integer[0];
