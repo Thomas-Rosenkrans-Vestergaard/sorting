@@ -7,6 +7,30 @@ public class Sorting
 {
 
 	/**
+	 * Sorts the provided array of <code>comparable</code> values using the merge-sort algorithm. Null values are
+	 * considered smaller than all other values.
+	 *
+	 * @param array The array to sort.
+	 * @param <T>   The type of value in the array to sort.
+	 */
+	public static <T extends Comparable<T>> void mergesort(T[] array)
+	{
+		mergesort(array, (o1, o2) -> {
+
+			if (o1 == null && o2 == null)
+				return 0;
+
+			if (o1 == null)
+				return -1;
+
+			if (o2 == null)
+				return 1;
+
+			return o1.compareTo(o2);
+		});
+	}
+
+	/**
 	 * Sorts the provided array using the merge-sort algorithm. The merge sort algorithm is stable meaning that equal
 	 * values in the array retain their order when sorted.
 	 *
@@ -16,52 +40,86 @@ public class Sorting
 	 */
 	public static <T> void mergesort(T[] array, Comparator<T> comparator)
 	{
-
 		if (array.length < 2)
 			return;
 
-		int mid   = array.length / 2;
-		T[] left  = (T[]) new Object[mid];
-		T[] right = (T[]) new Object[array.length - mid];
-
-		int index = 0;
-		for (int x = 0; x < left.length; x++)
-			left[x] = array[index++];
-
-		for (int x = 0; x < right.length; x++)
-			right[x] = array[index++];
-
-		mergesort(left, comparator);
-		mergesort(right, comparator);
-		merge(array, left, right, comparator);
+		T[] auxiliary = (T[]) new Object[array.length];
+		mergesort(array, auxiliary, 0, array.length - 1, comparator);
 	}
 
 	/**
-	 * Merges the sorted array <code>left</code> and <code>right</code> into <code>array</code>. The arrays are
-	 * merged in <code>O(n)</code> time.
+	 * Recursive method that sorts the provided array from index <code>low</code> to index <code>high</code>
+	 * (inclusive) using the merge sort algorithm.
 	 *
-	 * @param array      The array to merge <code>left</code> and <code>right</code> into.
-	 * @param left       The first array to merge from.
-	 * @param right      The second array to merge from.
-	 * @param comparator The comparator to use when merging.
-	 * @param <T>        The type of the values in the arrays.
+	 * @param array      The array to be sorted.
+	 * @param auxiliary  The array used for auxiliary storage during the sorting.
+	 * @param from       The index to sort from (inclusive).
+	 * @param to         The index to sort to (inclusive).
+	 * @param comparator The comparator that dictates the sorting of the array.
+	 * @param <T>        The type of value in the array to sort.
 	 */
-	private static <T> void merge(T[] array, T[] left, T[] right, Comparator<T> comparator)
+	private static <T> void mergesort(T[] array, T[] auxiliary, int from, int to, Comparator<T> comparator)
 	{
-		int l = 0;
-		int r = 0;
-		for (int x = 0; x < array.length; x++) {
-			if (l == left.length)
-				array[x] = right[r++];
-			else if (r == right.length)
-				array[x] = left[l++];
-			else
-				array[x] = comparator.compare(left[l], right[r]) < 1 ? left[l++] : right[r++];
+		if (from < to) {
+			int mid = from + (to - from) / 2;
+			mergesort(array, auxiliary, from, mid, comparator);
+			mergesort(array, auxiliary, mid + 1, to, comparator);
+			merge(array, auxiliary, from, mid, to, comparator);
 		}
 	}
 
 	/**
-	 * Sorts the provided array using the merge-sort algorithm. The merge sort algorithm is stable meaning that equal
+	 * Merges the two sections in the provided array <code>auxiliary</code>, bounded by <code>from</code>,
+	 * <code>mid</code> and <code>to</code>, into <code>array</code>.
+	 *
+	 * @param array      The array to merge into.
+	 * @param auxiliary  The array to merge from.
+	 * @param from       The index of the first section in auxiliary.
+	 * @param mid        The index of the end of the first section in auxiliary.
+	 * @param to         The index of the end of the last section in auxiliary.
+	 * @param comparator The comparator dictating the order of the merge.
+	 * @param <T>        The type of the values in the array.
+	 */
+	private static <T> void merge(T[] array, T[] auxiliary, int from, int mid, int to, Comparator<T> comparator)
+	{
+		for (int i = from; i <= to; i++)
+			auxiliary[i] = array[i];
+
+		int i = from;
+		int j = mid + 1;
+		int k = from;
+
+		while (i <= mid && j <= to)
+			array[k++] = comparator.compare(auxiliary[i], auxiliary[j]) < 1 ? auxiliary[i++] : auxiliary[j++];
+		while (i <= mid)
+			array[k++] = auxiliary[i++];
+	}
+
+	/**
+	 * Sorts the provided list using the merge-sort algorithm. The merge sort algorithm is stable meaning that equal
+	 * values in the array retain their order when sorted.
+	 *
+	 * @param list The list to be sorted.
+	 * @param <T>  The type of value to sort.
+	 */
+	public static <T extends Comparable<T>> void mergesort(List<T> list)
+	{
+		mergesort(list, (o1, o2) -> {
+			if (o1 == null && o2 == null)
+				return 0;
+
+			if (o1 == null)
+				return -1;
+
+			if (o2 == null)
+				return 1;
+
+			return o1.compareTo(o2);
+		});
+	}
+
+	/**
+	 * Sorts the provided list using the merge-sort algorithm. The merge sort algorithm is stable meaning that equal
 	 * values in the array retain their order when sorted.
 	 *
 	 * @param list       The list to be sorted.
@@ -75,45 +133,57 @@ public class Sorting
 		if (size < 2)
 			return;
 
-		int mid   = size / 2;
-		T[] left  = (T[]) new Object[mid];
-		T[] right = (T[]) new Object[size - mid];
-
-		int index = 0;
-		for (int x = 0; x < left.length; x++)
-			left[x] = list.get(index++);
-
-		for (int x = 0; x < right.length; x++)
-			right[x] = list.get(index++);
-
-		mergesort(left, comparator);
-		mergesort(right, comparator);
-		merge(list, left, right, comparator);
+		T[] auxiliary = (T[]) new Object[size];
+		mergesort(list, auxiliary, 0, size - 1, comparator);
 	}
 
 	/**
-	 * Merges the sorted array <code>left</code> and <code>right</code> into <code>array</code>. The arrays are
-	 * merged in <code>O(n)</code> time.
+	 * Sorts the provided list from index <code>from</code> to <code>to</code> (inclusive) using the merge-sort
+	 * algorithm. The merge sort algorithm is stable meaning that equal values in the array retain their order when
+	 * sorted.
 	 *
-	 * @param list       The list to merge <code>left</code> and <code>right</code> into.
-	 * @param left       The first array to merge from.
-	 * @param right      The second array to merge from.
-	 * @param comparator The comparator to use when merging.
-	 * @param <T>        The type of the values in the arrays.
+	 * @param list       The list to be sorted.
+	 * @param auxiliary  The array used for auxiliary storage during the sorting.
+	 * @param from       The index to sort from (inclusive).
+	 * @param to         The index to sort to (inclusive).
+	 * @param comparator The comparator that dictates the sorting of the list.
+	 * @param <T>        The type of value in the list to sort.
 	 */
-	private static <T> void merge(List<T> list, T[] left, T[] right, Comparator<T> comparator)
+	private static <T> void mergesort(List<T> list, T[] auxiliary, int from, int to, Comparator<T> comparator)
 	{
-		int size = list.size();
-		int l    = 0;
-		int r    = 0;
-		for (int x = 0; x < size; x++) {
-			if (l == left.length)
-				list.set(x, right[r++]);
-			else if (r == right.length)
-				list.set(x, left[l++]);
-			else
-				list.set(x, comparator.compare(left[l], right[r]) < 1 ? left[l++] : right[r++]);
+		if (from < to) {
+			int mid = from + (to - from) / 2;
+			mergesort(list, auxiliary, from, mid, comparator);
+			mergesort(list, auxiliary, mid + 1, to, comparator);
+			merge(list, auxiliary, from, mid, to, comparator);
 		}
+	}
+
+	/**
+	 * Merges the two sections in the provided array <code>auxiliary</code>, bounded by <code>from</code>,
+	 * <code>mid</code> and <code>to</code>, into <code>list</code>.
+	 *
+	 * @param list       The list to merge into.
+	 * @param auxiliary  The array to merge from.
+	 * @param from       The index of the first section in auxiliary.
+	 * @param mid        The index of the end of the first section in auxiliary.
+	 * @param to         The index of the end of the last section in auxiliary.
+	 * @param comparator The comparator dictating the order of the merge.
+	 * @param <T>        The type of the values in the list.
+	 */
+	private static <T> void merge(List<T> list, T[] auxiliary, int from, int mid, int to, Comparator<T> comparator)
+	{
+		for (int i = from; i <= to; i++)
+			auxiliary[i] = list.get(i);
+
+		int i = from;
+		int j = mid + 1;
+		int k = from;
+
+		while (i <= mid && j <= to)
+			list.set(k++, comparator.compare(auxiliary[i], auxiliary[j]) < 1 ? auxiliary[i++] : auxiliary[j++]);
+		while (i <= mid)
+			list.set(k++, auxiliary[i++]);
 	}
 
 	/**
