@@ -49,7 +49,8 @@ public class Sorting
 
 	/**
 	 * Recursive method that sorts the provided array from index <code>low</code> to index <code>high</code>
-	 * (inclusive) using the merge sort algorithm.
+	 * (inclusive)
+	 * using the merge sort algorithm.
 	 *
 	 * @param array      The array to be sorted.
 	 * @param auxiliary  The array used for auxiliary storage during the sorting.
@@ -85,14 +86,14 @@ public class Sorting
 		for (int i = from; i <= to; i++)
 			auxiliary[i] = array[i];
 
-		int i = from;
-		int j = mid + 1;
+		int l = from;
+		int r = mid + 1;
 		int k = from;
 
-		while (i <= mid && j <= to)
-			array[k++] = comparator.compare(auxiliary[i], auxiliary[j]) < 1 ? auxiliary[i++] : auxiliary[j++];
-		while (i <= mid)
-			array[k++] = auxiliary[i++];
+		while (l <= mid && r <= to)
+			array[k++] = comparator.compare(auxiliary[l], auxiliary[r]) < 1 ? auxiliary[l++] : auxiliary[r++];
+		while (l <= mid)
+			array[k++] = auxiliary[l++];
 	}
 
 	/**
